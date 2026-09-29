@@ -3,6 +3,9 @@ require("dotenv").config();
 const app=express(), port=process.env.PORT||3000;
 const pool=new Pool({connectionString:process.env.DATABASE_URL});
 app.use(express.json()); app.use(express.urlencoded({extended:true}));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 const uploadDir=path.join(__dirname,"public","uploads"); fs.mkdirSync(uploadDir,{recursive:true});
 const storage=multer.diskStorage({destination:uploadDir,filename:(r,f,cb)=>cb(null,Date.now()+"-"+Math.random().toString(36).slice(2)+path.extname(f.originalname))});
 const upload=multer({storage,limits:{fileSize:5*1024*1024}});
