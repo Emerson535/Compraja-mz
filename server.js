@@ -3,13 +3,18 @@ require("dotenv").config();
 const app=express(), port=process.env.PORT||3000;
 const pool=new Pool({connectionString:process.env.DATABASE_URL});
 app.use(express.json()); app.use(express.urlencoded({extended:true}));
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
 const uploadDir=path.join(__dirname,"public","uploads"); fs.mkdirSync(uploadDir,{recursive:true});
 const storage=multer.diskStorage({destination:uploadDir,filename:(r,f,cb)=>cb(null,Date.now()+"-"+Math.random().toString(36).slice(2)+path.extname(f.originalname))});
 const upload=multer({storage,limits:{fileSize:5*1024*1024}});
-app.use(express.static(path.join(__dirname,"public")));
+const publicDir=path.join(__dirname,"public");
+const publicIndex=path.join(publicDir,"index.html");
+const rootIndex=path.join(__dirname,"index.html");
+app.use(express.static(publicDir));
+app.get("/",(req,res)=>{
+  const indexFile=fs.existsSync(publicIndex)?publicIndex:rootIndex;
+  if(!fs.existsSync(indexFile)) return res.status(500).send("index.html não encontrado");
+  res.sendFile(indexFile);
+});
 const cats=["Livros","Roupas","Eletrónicos","Casa","Móveis","Automóveis","Telemóveis","Desporto","Outros"];
 function token(u){return jwt.sign({id:u.id,role:u.role},process.env.JWT_SECRET||"dev-secret",{expiresIn:"7d"})}
 function auth(req,res,next){try{const h=req.headers.authorization||"";req.user=jwt.verify(h.replace("Bearer ",""),process.env.JWT_SECRET||"dev-secret");next()}catch(e){res.status(401).json({error:"Não autenticado"})}}

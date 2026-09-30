@@ -21,4 +21,3 @@ document.getElementById("authForm").onsubmit=async e=>{e.preventDefault();let re
 document.getElementById("sellForm").onsubmit=async e=>{e.preventDefault();try{let r=await fetch("/api/listings",{method:"POST",headers:{Authorization:"Bearer "+token},body:new FormData(e.target)}),d=await r.json();if(!r.ok)throw Error(d.error);closeAll();e.target.reset();load();alert("Anúncio publicado!")}catch(x){document.getElementById("sellMsg").textContent=x.message}}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}load();
 </script></body></html>
-                                        
